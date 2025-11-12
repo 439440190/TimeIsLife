@@ -23,10 +23,6 @@ using System.Reflection;
 
 // 该行不是必需的，但是可以提高加载性能
 [assembly: ExtensionApplication(typeof(TimeIsLife.MyPlugin))]
-[assembly: CommandClass(typeof(ElectricalCommand))]
-[assembly: CommandClass(typeof(FireAlarmCommand1))]
-[assembly: CommandClass(typeof(LightingCommand))]
-[assembly: CommandClass(typeof(TilCommand))]
 
 namespace TimeIsLife
 {
@@ -48,6 +44,8 @@ namespace TimeIsLife
 
             // 在此处初始化您的插件应用程序+
             Autodesk.Windows.ComponentManager.ItemInitialized += ComponentManager_ItemInitialized;
+            // 设置全局兼容性属性
+            //System.Windows.FrameworkCompatibilityPreferences.KeepTextBoxDisplaySynchronizedWithTextProperty = false;
             // 加载用户数据
             LoadUserData();
 
@@ -137,6 +135,12 @@ namespace TimeIsLife
             CurrentUserData = JsonConvert.DeserializeObject<UserData>(jsonData);
         }
 
+        private void SaveUserData()
+        {
+            string jsonData = JsonConvert.SerializeObject(CurrentUserData, Formatting.Indented);
+            File.WriteAllText(userDataPath, jsonData);
+        }
+
         private ObservableCollection<FireAlarmEquipment> GetFireAlarmEquipments(string blockDirectory, string schematicBlockDirectory)
         {
             return new ObservableCollection<FireAlarmEquipment>()
@@ -156,42 +160,36 @@ namespace TimeIsLife
                 new FireAlarmEquipment(FireAlarmEquipmentType.Fa13, "电动排烟阀(常开)", Path.Combine(blockDirectory, "FA-13-电动排烟阀(常开).dwg"), Path.Combine(schematicBlockDirectory, "FA-13-电动排烟阀(常开).dwg"), true, false, 900),
                 new FireAlarmEquipment(FireAlarmEquipmentType.Fa14, "常闭正压送风口", Path.Combine(blockDirectory, "FA-14-常闭正压送风口.dwg"), Path.Combine(schematicBlockDirectory, "FA-14-常闭正压送风口.dwg"), true, false, 900),
                 // 继续之前的实例化
-    new FireAlarmEquipment(FireAlarmEquipmentType.Fa15, "防火卷帘控制器", Path.Combine(blockDirectory, "FA-15-防火卷帘控制器.dwg"), Path.Combine(schematicBlockDirectory, "FA-15-防火卷帘控制器.dwg"), true, false, 900),
-    new FireAlarmEquipment(FireAlarmEquipmentType.Fa16, "电动挡烟垂壁控制箱", Path.Combine(blockDirectory, "FA-16-电动挡烟垂壁控制箱.dwg"), Path.Combine(schematicBlockDirectory, "FA-16-电动挡烟垂壁控制箱.dwg"), true, false, 900),
-    new FireAlarmEquipment(FireAlarmEquipmentType.Fa17, "水流指示器", Path.Combine(blockDirectory, "FA-17-水流指示器.dwg"), Path.Combine(schematicBlockDirectory, "FA-17-水流指示器.dwg"), true, false, 900),
-    new FireAlarmEquipment(FireAlarmEquipmentType.Fa18, "信号阀", Path.Combine(blockDirectory, "FA-18-信号阀.dwg"), Path.Combine(schematicBlockDirectory, "FA-18-信号阀.dwg"), true, false, 900),
-    new FireAlarmEquipment(FireAlarmEquipmentType.Fa19, "智能线型红外光束感烟探测器（发射端）", Path.Combine(blockDirectory, "FA-19-智能线型红外光束感烟探测器（发射端）.dwg"), Path.Combine(schematicBlockDirectory, "FA-19-智能线型红外光束感烟探测器（发射端）.dwg"), true, false, 900),
-    new FireAlarmEquipment(FireAlarmEquipmentType.Fa20, "智能线型红外光束感烟探测器（接收端）", Path.Combine(blockDirectory, "FA-20-智能线型红外光束感烟探测器（接收端）.dwg"), Path.Combine(schematicBlockDirectory, "FA-20-智能线型红外光束感烟探测器（接收端）.dwg"), true, false, 900),
-    new FireAlarmEquipment(FireAlarmEquipmentType.Fa21, "电动排烟窗控制箱", Path.Combine(blockDirectory, "FA-21-电动排烟窗控制箱.dwg"), Path.Combine(schematicBlockDirectory, "FA-21-电动排烟窗控制箱.dwg"), true, false, 900),
-    new FireAlarmEquipment(FireAlarmEquipmentType.Fa22, "消防电梯控制箱", Path.Combine(blockDirectory, "FA-22-消防电梯控制箱.dwg"), Path.Combine(schematicBlockDirectory, "FA-22-消防电梯控制箱.dwg"), true, false, 900),
-    new FireAlarmEquipment(FireAlarmEquipmentType.Fa23, "电梯控制箱", Path.Combine(blockDirectory, "FA-23-电梯控制箱.dwg"), Path.Combine(schematicBlockDirectory, "FA-23-电梯控制箱.dwg"), true, false, 900),
-    new FireAlarmEquipment(FireAlarmEquipmentType.Fa24, "湿式报警阀组", Path.Combine(blockDirectory, "FA-24-湿式报警阀组.dwg"), Path.Combine(schematicBlockDirectory, "FA-24-湿式报警阀组.dwg"), true, false, 900),
-    new FireAlarmEquipment(FireAlarmEquipmentType.Fa25, "预作用报警阀组", Path.Combine(blockDirectory, "FA-25-预作用报警阀组.dwg"), Path.Combine(schematicBlockDirectory, "FA-25-预作用报警阀组.dwg"), true, false, 900),
-    new FireAlarmEquipment(FireAlarmEquipmentType.Fa26, "可燃气体探测控制器", Path.Combine(blockDirectory, "FA-26-可燃气体探测控制器.dwg"), Path.Combine(schematicBlockDirectory, "FA-26-可燃气体探测控制器.dwg"), true, false, 900),
-    new FireAlarmEquipment(FireAlarmEquipmentType.Fa27, "流量开关", Path.Combine(blockDirectory, "FA-27-流量开关.dwg"), Path.Combine(schematicBlockDirectory, "FA-27-流量开关.dwg"), true, false, 900),
-    new FireAlarmEquipment(FireAlarmEquipmentType.Fa28, "非消防配电箱", Path.Combine(blockDirectory, "FA-28-非消防配电箱.dwg"), Path.Combine(schematicBlockDirectory, "FA-28-非消防配电箱.dwg"), true, false, 900),
-    new FireAlarmEquipment(FireAlarmEquipmentType.Fa29, "消防泵控制箱", Path.Combine(blockDirectory, "FA-29-消防泵控制箱.dwg"), Path.Combine(schematicBlockDirectory, "FA-29-消防泵控制箱.dwg"), true, false, 900),
-    new FireAlarmEquipment(FireAlarmEquipmentType.Fa30, "喷淋泵控制箱", Path.Combine(blockDirectory, "FA-30-喷淋泵控制箱.dwg"), Path.Combine(schematicBlockDirectory, "FA-30-喷淋泵控制箱.dwg"), true, false, 900),
-    new FireAlarmEquipment(FireAlarmEquipmentType.Fa31, "消防稳压泵控制箱", Path.Combine(blockDirectory, "FA-31-消防稳压泵控制箱.dwg"), Path.Combine(schematicBlockDirectory, "FA-31-消防稳压泵控制箱.dwg"), true, false, 900),
-    new FireAlarmEquipment(FireAlarmEquipmentType.Fa32, "雨淋泵控制箱", Path.Combine(blockDirectory, "FA-32-雨淋泵控制箱.dwg"), Path.Combine(schematicBlockDirectory, "FA-32-雨淋泵控制箱.dwg"), true, false, 900),
-    new FireAlarmEquipment(FireAlarmEquipmentType.Fa33, "水幕泵控制箱", Path.Combine(blockDirectory, "FA-33-水幕泵控制箱.dwg"), Path.Combine(schematicBlockDirectory, "FA-33-水幕泵控制箱.dwg"), true, false, 900),
-    new FireAlarmEquipment(FireAlarmEquipmentType.Fa34, "消防风机控制箱", Path.Combine(blockDirectory, "FA-34-消防风机控制箱.dwg"), Path.Combine(schematicBlockDirectory, "FA-34-消防风机控制箱.dwg"), true, false, 900),
-    new FireAlarmEquipment(FireAlarmEquipmentType.Fa35, "就地液位显示盘", Path.Combine(blockDirectory, "FA-35-就地液位显示盘.dwg"), Path.Combine(schematicBlockDirectory, "FA-35-就地液位显示盘.dwg"), true, false, 4000),
-    new FireAlarmEquipment(FireAlarmEquipmentType.Fa37, "区域显示器", Path.Combine(blockDirectory, "FA-37-区域显示器.dwg"), Path.Combine(schematicBlockDirectory, "FA-37-区域显示器.dwg"), true, false, 1300),
-    new FireAlarmEquipment(FireAlarmEquipmentType.Fa38, "常闭防火门监控模块", Path.Combine(blockDirectory, "FA-38-常闭防火门监控模块.dwg"), Path.Combine(schematicBlockDirectory, "FA-38-常闭防火门监控模块.dwg"), true, false, 1300),
-    new FireAlarmEquipment(FireAlarmEquipmentType.Fa39, "常开防火门监控模块", Path.Combine(blockDirectory, "FA-39-常开防火门监控模块.dwg"), Path.Combine(schematicBlockDirectory, "FA-39-常开防火门监控模块.dwg"), true, false, 1300),
-    new FireAlarmEquipment(FireAlarmEquipmentType.Fa40, "压力开关", Path.Combine(blockDirectory, "FA-40-压力开关.dwg"), Path.Combine(schematicBlockDirectory, "FA-40-压力开关.dwg"), true, false, 900),
-    new FireAlarmEquipment(FireAlarmEquipmentType.Fa41, "火焰探测器", Path.Combine(blockDirectory, "FA-41-火焰探测器.dwg"), Path.Combine(schematicBlockDirectory, "FA-41-火焰探测器.dwg"), true, false, 900),
-    new FireAlarmEquipment(FireAlarmEquipmentType.Fa42, "电磁阀", Path.Combine(blockDirectory, "FA-42-电磁阀.dwg"), Path.Combine(schematicBlockDirectory, "FA-42-电磁阀.dwg"), true, false, 900),
-    new FireAlarmEquipment(FireAlarmEquipmentType.Fa43, "门禁控制器", Path.Combine(blockDirectory, "FA-43-门禁控制器.dwg"), Path.Combine(schematicBlockDirectory, "FA-43-门禁控制器.dwg"), true, false, 900),
-    new FireAlarmEquipment(FireAlarmEquipmentType.Fa69, "总线短路隔离器", Path.Combine(blockDirectory, "FA-总线短路隔离器.dwg"), string.Empty, false, false, 900),
+                new FireAlarmEquipment(FireAlarmEquipmentType.Fa15, "防火卷帘控制器", Path.Combine(blockDirectory, "FA-15-防火卷帘控制器.dwg"), Path.Combine(schematicBlockDirectory, "FA-15-防火卷帘控制器.dwg"), true, false, 900),
+                new FireAlarmEquipment(FireAlarmEquipmentType.Fa16, "电动挡烟垂壁控制箱", Path.Combine(blockDirectory, "FA-16-电动挡烟垂壁控制箱.dwg"), Path.Combine(schematicBlockDirectory, "FA-16-电动挡烟垂壁控制箱.dwg"), true, false, 900),
+                new FireAlarmEquipment(FireAlarmEquipmentType.Fa17, "水流指示器", Path.Combine(blockDirectory, "FA-17-水流指示器.dwg"), Path.Combine(schematicBlockDirectory, "FA-17-水流指示器.dwg"), true, false, 900),
+                new FireAlarmEquipment(FireAlarmEquipmentType.Fa18, "信号阀", Path.Combine(blockDirectory, "FA-18-信号阀.dwg"), Path.Combine(schematicBlockDirectory, "FA-18-信号阀.dwg"), true, false, 900),
+                new FireAlarmEquipment(FireAlarmEquipmentType.Fa19, "智能线型红外光束感烟探测器（发射端）", Path.Combine(blockDirectory, "FA-19-智能线型红外光束感烟探测器（发射端）.dwg"), Path.Combine(schematicBlockDirectory, "FA-19-智能线型红外光束感烟探测器（发射端）.dwg"), true, false, 900),
+                new FireAlarmEquipment(FireAlarmEquipmentType.Fa20, "智能线型红外光束感烟探测器（接收端）", Path.Combine(blockDirectory, "FA-20-智能线型红外光束感烟探测器（接收端）.dwg"), Path.Combine(schematicBlockDirectory, "FA-20-智能线型红外光束感烟探测器（接收端）.dwg"), true, false, 900),
+                new FireAlarmEquipment(FireAlarmEquipmentType.Fa21, "电动排烟窗控制箱", Path.Combine(blockDirectory, "FA-21-电动排烟窗控制箱.dwg"), Path.Combine(schematicBlockDirectory, "FA-21-电动排烟窗控制箱.dwg"), true, false, 900),
+                new FireAlarmEquipment(FireAlarmEquipmentType.Fa22, "消防电梯控制箱", Path.Combine(blockDirectory, "FA-22-消防电梯控制箱.dwg"), Path.Combine(schematicBlockDirectory, "FA-22-消防电梯控制箱.dwg"), true, false, 900),
+                new FireAlarmEquipment(FireAlarmEquipmentType.Fa23, "电梯控制箱", Path.Combine(blockDirectory, "FA-23-电梯控制箱.dwg"), Path.Combine(schematicBlockDirectory, "FA-23-电梯控制箱.dwg"), true, false, 900),
+                new FireAlarmEquipment(FireAlarmEquipmentType.Fa24, "湿式报警阀组", Path.Combine(blockDirectory, "FA-24-湿式报警阀组.dwg"), Path.Combine(schematicBlockDirectory, "FA-24-湿式报警阀组.dwg"), true, false, 900),
+                new FireAlarmEquipment(FireAlarmEquipmentType.Fa25, "预作用报警阀组", Path.Combine(blockDirectory, "FA-25-预作用报警阀组.dwg"), Path.Combine(schematicBlockDirectory, "FA-25-预作用报警阀组.dwg"), true, false, 900),
+                new FireAlarmEquipment(FireAlarmEquipmentType.Fa26, "可燃气体探测控制器", Path.Combine(blockDirectory, "FA-26-可燃气体探测控制器.dwg"), Path.Combine(schematicBlockDirectory, "FA-26-可燃气体探测控制器.dwg"), true, false, 900),
+                new FireAlarmEquipment(FireAlarmEquipmentType.Fa27, "流量开关", Path.Combine(blockDirectory, "FA-27-流量开关.dwg"), Path.Combine(schematicBlockDirectory, "FA-27-流量开关.dwg"), true, false, 900),
+                new FireAlarmEquipment(FireAlarmEquipmentType.Fa28, "非消防配电箱", Path.Combine(blockDirectory, "FA-28-非消防配电箱.dwg"), Path.Combine(schematicBlockDirectory, "FA-28-非消防配电箱.dwg"), true, false, 900),
+                new FireAlarmEquipment(FireAlarmEquipmentType.Fa29, "消防泵控制箱", Path.Combine(blockDirectory, "FA-29-消防泵控制箱.dwg"), Path.Combine(schematicBlockDirectory, "FA-29-消防泵控制箱.dwg"), true, false, 900),
+                new FireAlarmEquipment(FireAlarmEquipmentType.Fa30, "喷淋泵控制箱", Path.Combine(blockDirectory, "FA-30-喷淋泵控制箱.dwg"), Path.Combine(schematicBlockDirectory, "FA-30-喷淋泵控制箱.dwg"), true, false, 900),
+                new FireAlarmEquipment(FireAlarmEquipmentType.Fa31, "消防稳压泵控制箱", Path.Combine(blockDirectory, "FA-31-消防稳压泵控制箱.dwg"), Path.Combine(schematicBlockDirectory, "FA-31-消防稳压泵控制箱.dwg"), true, false, 900),
+                new FireAlarmEquipment(FireAlarmEquipmentType.Fa32, "雨淋泵控制箱", Path.Combine(blockDirectory, "FA-32-雨淋泵控制箱.dwg"), Path.Combine(schematicBlockDirectory, "FA-32-雨淋泵控制箱.dwg"), true, false, 900),
+                new FireAlarmEquipment(FireAlarmEquipmentType.Fa33, "水幕泵控制箱", Path.Combine(blockDirectory, "FA-33-水幕泵控制箱.dwg"), Path.Combine(schematicBlockDirectory, "FA-33-水幕泵控制箱.dwg"), true, false, 900),
+                new FireAlarmEquipment(FireAlarmEquipmentType.Fa34, "消防风机控制箱", Path.Combine(blockDirectory, "FA-34-消防风机控制箱.dwg"), Path.Combine(schematicBlockDirectory, "FA-34-消防风机控制箱.dwg"), true, false, 900),
+                new FireAlarmEquipment(FireAlarmEquipmentType.Fa35, "就地液位显示盘", Path.Combine(blockDirectory, "FA-35-就地液位显示盘.dwg"), Path.Combine(schematicBlockDirectory, "FA-35-就地液位显示盘.dwg"), true, false, 4000),
+                new FireAlarmEquipment(FireAlarmEquipmentType.Fa37, "区域显示器", Path.Combine(blockDirectory, "FA-37-区域显示器.dwg"), Path.Combine(schematicBlockDirectory, "FA-37-区域显示器.dwg"), true, false, 1300),
+                new FireAlarmEquipment(FireAlarmEquipmentType.Fa38, "常闭防火门监控模块", Path.Combine(blockDirectory, "FA-38-常闭防火门监控模块.dwg"), Path.Combine(schematicBlockDirectory, "FA-38-常闭防火门监控模块.dwg"), true, false, 1300),
+                new FireAlarmEquipment(FireAlarmEquipmentType.Fa39, "常开防火门监控模块", Path.Combine(blockDirectory, "FA-39-常开防火门监控模块.dwg"), Path.Combine(schematicBlockDirectory, "FA-39-常开防火门监控模块.dwg"), true, false, 1300),
+                new FireAlarmEquipment(FireAlarmEquipmentType.Fa40, "压力开关", Path.Combine(blockDirectory, "FA-40-压力开关.dwg"), Path.Combine(schematicBlockDirectory, "FA-40-压力开关.dwg"), true, false, 900),
+                new FireAlarmEquipment(FireAlarmEquipmentType.Fa41, "火焰探测器", Path.Combine(blockDirectory, "FA-41-火焰探测器.dwg"), Path.Combine(schematicBlockDirectory, "FA-41-火焰探测器.dwg"), true, false, 900),
+                new FireAlarmEquipment(FireAlarmEquipmentType.Fa42, "电磁阀", Path.Combine(blockDirectory, "FA-42-电磁阀.dwg"), Path.Combine(schematicBlockDirectory, "FA-42-电磁阀.dwg"), true, false, 900),
+                new FireAlarmEquipment(FireAlarmEquipmentType.Fa43, "门禁控制器", Path.Combine(blockDirectory, "FA-43-门禁控制器.dwg"), Path.Combine(schematicBlockDirectory, "FA-43-门禁控制器.dwg"), true, false, 900),
+                new FireAlarmEquipment(FireAlarmEquipmentType.Fa69, "总线短路隔离器", Path.Combine(blockDirectory, "FA-总线短路隔离器.dwg"), string.Empty, false, false, 900),
             };
-        }
-
-        private void SaveUserData()
-        {
-            string jsonData = JsonConvert.SerializeObject(CurrentUserData, Formatting.Indented);
-            File.WriteAllText(userDataPath, jsonData);
         }
 
         #endregion

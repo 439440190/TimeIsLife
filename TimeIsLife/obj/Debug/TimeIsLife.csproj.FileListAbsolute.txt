@@ -26,8 +26,6 @@ D:\github\TimeIsLife\TimeIsLife\bin\Debug\acdbmgdbrep.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\CommunityToolkit.Mvvm.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\CommunityToolkit.Mvvm.pdb
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\Dapper.dll
-D:\github\TimeIsLife\TimeIsLife\bin\Debug\EntityFramework.SqlServer.dll
-D:\github\TimeIsLife\TimeIsLife\bin\Debug\EntityFramework.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\Microsoft.Bcl.AsyncInterfaces.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\Microsoft.Xaml.Behaviors.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\Microsoft.Xaml.Behaviors.pdb
@@ -36,8 +34,6 @@ D:\github\TimeIsLife\TimeIsLife\bin\Debug\Newtonsoft.Json.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\System.Data.SQLite.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\System.Buffers.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\System.ComponentModel.Annotations.dll
-D:\github\TimeIsLife\TimeIsLife\bin\Debug\System.Data.SQLite.EF6.dll
-D:\github\TimeIsLife\TimeIsLife\bin\Debug\System.Data.SQLite.Linq.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\System.Memory.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\System.Numerics.Vectors.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
@@ -366,3 +362,13 @@ D:\GitHub\TimeIsLife\TimeIsLife\obj\Debug\View\F9_Window.baml
 D:\GitHub\TimeIsLife\TimeIsLife\obj\Debug\View\FireAlarmSystemView.baml
 D:\GitHub\TimeIsLife\TimeIsLife\obj\Debug\View\F7_Window.baml
 D:\GitHub\TimeIsLife\TimeIsLife\obj\Debug\TimeIsLife.csproj.Up2Date
+D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\abseil_dll.dll
+D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\bz2.dll
+D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\highs.dll
+D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\libprotobuf.dll
+D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\libscip.dll
+D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\libutf8_validity.dll
+D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\ortools.dll
+D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\re2.dll
+D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\zlib1.dll
+D:\GitHub\TimeIsLife\TimeIsLife\obj\Debug\TimeIsLife.GeneratedMSBuildEditorConfig.editorconfig

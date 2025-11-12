@@ -59,7 +59,7 @@ using TimeIsLife.View;
 using Point = NetTopologySuite.Geometries.Point;
 using TimeIsLife.Jig;
 using MessageBox = System.Windows.Forms.MessageBox;
-using System.Data.Entity;
+
 using Database = Autodesk.AutoCAD.DatabaseServices.Database;
 using NetTopologySuite.Precision;
 using NetTopologySuite.Operation.Distance;

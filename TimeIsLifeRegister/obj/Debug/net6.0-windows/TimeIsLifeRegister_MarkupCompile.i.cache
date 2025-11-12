@@ -8,13 +8,13 @@ D:\GitHub\TimeIsLife\TimeIsLifeRegister\obj\Debug\net6.0-windows\
 TimeIsLifeRegister
 none
 false
-TRACE;DEBUG;NET;NET6_0;NETCOREAPP
+TRACE;DEBUG;NET;NET6_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER;WINDOWS7_0_OR_GREATER
 D:\GitHub\TimeIsLife\TimeIsLifeRegister\App.xaml
 6-948320637
 
 81373470682
-1962011892102
+196-1675808230
 MainWindow.xaml;Resources\Button.xaml;Resources\Expander.xaml;Resources\ListBox.xaml;Resources\Shared.xaml;Resources\TextBox.xaml;
 
-True
+False
 

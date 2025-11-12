@@ -37,7 +37,6 @@ namespace TimeIsLife.CADCommand
             if (pointResult.Status != PromptStatus.OK) return;
             Point3d point3D4 = pointResult.Value;
 
-            string pathLevel = "B1";
 
             string codeBase = Assembly.GetExecutingAssembly().CodeBase;
             UriBuilder uri = new UriBuilder(codeBase);

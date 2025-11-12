@@ -15,7 +15,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Data.Entity;
+
 using System.Data.SQLite;
 using System.IO;
 using System.Linq;

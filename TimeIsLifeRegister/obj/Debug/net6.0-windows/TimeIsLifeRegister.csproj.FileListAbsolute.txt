@@ -22,7 +22,6 @@ D:\GitHub\TimeIsLife\TimeIsLifeRegister\obj\Debug\net6.0-windows\TimeIsLifeRegis
 D:\GitHub\TimeIsLife\TimeIsLifeRegister\obj\Debug\net6.0-windows\TimeIsLifeRegister.AssemblyInfoInputs.cache
 D:\GitHub\TimeIsLife\TimeIsLifeRegister\obj\Debug\net6.0-windows\TimeIsLifeRegister.AssemblyInfo.cs
 D:\GitHub\TimeIsLife\TimeIsLifeRegister\obj\Debug\net6.0-windows\TimeIsLifeRegister.csproj.CoreCompileInputs.cache
-D:\GitHub\TimeIsLife\TimeIsLifeRegister\obj\Debug\net6.0-windows\TimeIsLifeRegister.csproj.CopyComplete
 D:\GitHub\TimeIsLife\TimeIsLifeRegister\obj\Debug\net6.0-windows\TimeIsLifeRegister.dll
 D:\GitHub\TimeIsLife\TimeIsLifeRegister\obj\Debug\net6.0-windows\refint\TimeIsLifeRegister.dll
 D:\GitHub\TimeIsLife\TimeIsLifeRegister\obj\Debug\net6.0-windows\TimeIsLifeRegister.pdb
@@ -59,3 +58,5 @@ D:\GitHub\TimeIsLifeRegister\obj\Debug\net6.0-windows\refint\TimeIsLifeRegister.
 D:\GitHub\TimeIsLifeRegister\obj\Debug\net6.0-windows\TimeIsLifeRegister.pdb
 D:\GitHub\TimeIsLifeRegister\obj\Debug\net6.0-windows\TimeIsLifeRegister.genruntimeconfig.cache
 D:\GitHub\TimeIsLifeRegister\obj\Debug\net6.0-windows\ref\TimeIsLifeRegister.dll
+D:\GitHub\TimeIsLife\TimeIsLifeRegister\obj\Debug\net6.0-windows\TimeIsLifeRegister.sourcelink.json
+D:\GitHub\TimeIsLife\TimeIsLifeRegister\obj\Debug\net6.0-windows\TimeIsLi.0EECF319.Up2Date
