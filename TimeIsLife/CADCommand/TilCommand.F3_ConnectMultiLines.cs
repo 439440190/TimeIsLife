@@ -26,102 +26,145 @@ namespace TimeIsLife.CADCommand
         {
 
             // 获取当前文档和数据库的引用
-            Document document = Application.DocumentManager.CurrentDocument;
-            Database database = document.Database;
-            Editor editor = document.Editor;
-            Matrix3d ucsToWcsMatrix3d = editor.CurrentUserCoordinateSystem;
+            Document doc = Application.DocumentManager.CurrentDocument;
+            Database db = doc.Database;
+            Editor ed = doc.Editor;
+            Matrix3d ucs2wcs = ed.CurrentUserCoordinateSystem;
 
-			GeometryFactory geometryFactory = CreateGeometryFactory();
 
-            string s1 = "\n作用：多个块按照最近距离自动连线。";
-            string s2 = "\n操作方法：框选对象";
-            string s3 = "\n注意事项：块不能锁定";
-            editor.WriteMessage(s1 + s2 + s3);
+            ed.WriteMessage(
+                "\n作用：多个块按照最近距离自动连线。" +
+                "\n操作方法：框选对象。" +
+                "\n注意事项：块不能锁定。"
+            );
 
-            using (Transaction transaction = database.TransactionManager.StartTransaction())
+            var ppr = ed.GetPoint("\n请选择第一个角点：");  //获取的UCS点
+            if (ppr.Status != PromptStatus.OK) return;
+            Point3d startPointWcs = ppr.Value.TransformBy(ucs2wcs);
+
+            //创建一个临时矩形，用于动态拖拽显示
+            db.LoadSysLineType(SystemLinetype.DASHED);
+
+            Polyline rect = new Polyline
             {
-                //获取块表
-                BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
-                //获取模型空间
-                BlockTableRecord modelSpace = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
-                //获取图纸空间
-                BlockTableRecord paperSpace = transaction.GetObject(blockTable[BlockTableRecord.PaperSpace], OpenMode.ForRead) as BlockTableRecord;
+                Closed = true,
+                Linetype = "DASHED",
+                Transparency = new Transparency(128),
+                ColorIndex = 31,
+                LinetypeScale = 1
+            };
+            for (int i = 0; i < 4; i++)
+                rect.AddVertexAt(i, new Point2d(0, 0), 0, 0, 0);
 
-                PromptPointResult ppr = editor.GetPoint(new PromptPointOptions("\n 请选择第一个角点："));
+            // 3️⃣ 启动 Jig
+            var jig = new UcsSelectJig(startPointWcs, rect);
+            if (ed.Drag(jig).Status != PromptStatus.OK)
+                return;
 
-                if (ppr.Status != PromptStatus.OK) return;
-                var startPoint3D = ppr.Value;
+            Point3d endPointWcs = jig.EndPointWcs;
 
-                database.LoadSysLineType(SystemLinetype.DASHED);
+            //计算矩形的四个角点（WCS）
+            Point3dCollection rectPts = GetRectPointsInWcs(startPointWcs, endPointWcs, ucs2wcs);
 
-                // 初始化矩形
-                Polyline polyLine = new Polyline
+
+            using (Transaction tr = db.TransactionManager.StartTransaction())
+            {
+                //获取块表与模型空间
+                BlockTable bt = (BlockTable)tr.GetObject(db.BlockTableId, OpenMode.ForRead);
+                BlockTableRecord ms = (BlockTableRecord)tr.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite);
+
+                //框选所有块参照
+                TypedValue[] filter = { new TypedValue((int)DxfCode.Start, "INSERT") };
+                SelectionFilter selFilter = new SelectionFilter(filter);
+
+                PromptSelectionResult psr = ed.SelectWindowPolygon(rectPts, selFilter); //SelectCrossingPolygon是UCS的点集；
+                if (psr.Status != PromptStatus.OK)
                 {
-                    Closed = true,
-                    Linetype = SystemLinetype.DASHED.ToString(),
-                    Transparency = new Transparency(128),
-                    ColorIndex = 31,
-                    LinetypeScale = 1000 / database.Ltscale
-                };
-                for (int i = 0; i < 4; i++)
-                {
-                    polyLine.AddVertexAt(i, new Point2d(0, 0), 0, 0, 0);
+                    tr.Commit();
+                    return;
                 }
 
-				UcsSelectJig ucsSelectJig = new UcsSelectJig(startPoint3D, polyLine);
-                PromptResult promptResult = editor.Drag(ucsSelectJig);
-                if (promptResult.Status != PromptStatus.OK) return;
-
-                var endPoint3D = ucsSelectJig.endPoint3d.TransformBy(ucsToWcsMatrix3d.Inverse());
-
-				Point3dCollection point3DCollection = GetPoint3DCollection(startPoint3D, endPoint3D, ucsToWcsMatrix3d);
-                TypedValueList typedValues = new TypedValueList
+                try
                 {
-                    typeof(BlockReference),
-                };
-                List<BlockReference> blockReferences = new List<BlockReference>();
+                    List<BlockReference> brList = new List<BlockReference>();
+                    foreach (ObjectId id in psr.Value.GetObjectIds())
+                    {
+                        BlockReference br = tr.GetObject(id, OpenMode.ForRead) as BlockReference;
+                        if (br == null) continue;
 
-				SelectionFilter selectionFilter = new SelectionFilter(typedValues);
-                PromptSelectionResult promptSelectionResult =
-                    editor.SelectCrossingPolygon(point3DCollection, selectionFilter);
-                if (promptSelectionResult.Status != PromptStatus.OK) return;
+                        LayerTableRecord layer = tr.GetObject(br.LayerId, OpenMode.ForRead) as LayerTableRecord;
+                        if (layer != null && layer.IsLocked) continue;
 
-                foreach (var id in promptSelectionResult.Value.GetObjectIds())
-                {
-                    BlockReference blockReference = transaction.GetObject(id, OpenMode.ForRead) as BlockReference;
-                    if (blockReference == null || blockReference.GetConnectionPoints().Count == 0) continue;
-					LayerTableRecord layerTableRecord =
-                        transaction.GetObject(blockReference.LayerId, OpenMode.ForRead) as LayerTableRecord;
-                    if (layerTableRecord != null && layerTableRecord.IsLocked) continue;
-                    blockReferences.Add(blockReference);
+                        brList.Add(br);
+                    }
+
+                    GeometryFactory geometryFactory = CreateGeometryFactory();
+                    var points = GetNtsPointsFromBlockreference(geometryFactory, brList)
+                        .Distinct()
+                        .ToList();
+
+                    List<LineString> tree = Kruskal.FindMinimumSpanningTree(points, geometryFactory);
+                    SetCurrentLayer(db, MyPlugin.CurrentUserData.WireLayerName, 1);
+                    const double tolerance = 1e-3;
+                    foreach (var line in tree)
+                    {
+                        var startPoint = new Point3d(line.Coordinates[0].X, line.Coordinates[0].Y, 0);
+                        var endPoint = new Point3d(line.Coordinates[1].X, line.Coordinates[1].Y, 0);
+
+                        var br1 = brList.FirstOrDefault(b =>
+                            Math.Abs(b.Position.X - startPoint.X) < tolerance &&
+                            Math.Abs(b.Position.Y - startPoint.Y) < tolerance);
+                        var br2 = brList.FirstOrDefault(b =>
+                            Math.Abs(b.Position.X - endPoint.X) < tolerance &&
+                            Math.Abs(b.Position.Y - endPoint.Y) < tolerance);
+
+                        Line connectline = GetBlockreferenceConnectline1(br1, br2);
+
+                        ms.AppendEntity(connectline);
+                        tr.AddNewlyCreatedDBObject(connectline, true);
+                    }
+                    tr.Commit();
                 }
-
-                var points = GetNtsPointsFromBlockreference(geometryFactory, blockReferences);
-                List<LineString> tree = Kruskal.FindMinimumSpanningTree(points, geometryFactory);
-                SetCurrentLayer(database, MyPlugin.CurrentUserData.WireLayerName, 1);
-                const double tolerance = 1e-3;
-                modelSpace.UpgradeOpen();
-                foreach (var line in tree)
+                catch
                 {
-                    var startPoint = new Point3d(line.Coordinates[0].X, line.Coordinates[0].Y, 0);
-                    var endPoint = new Point3d(line.Coordinates[1].X, line.Coordinates[1].Y, 0);
-
-                    var br1 = blockReferences.FirstOrDefault(b =>
-                        Math.Abs(b.Position.X - startPoint.X) < tolerance &&
-                        Math.Abs(b.Position.Y - startPoint.Y) < tolerance);
-                    var br2 = blockReferences.FirstOrDefault(b =>
-                        Math.Abs(b.Position.X - endPoint.X) < tolerance &&
-                        Math.Abs(b.Position.Y - endPoint.Y) < tolerance);
-
-                    Line connectline = GetBlockreferenceConnectline(br1, br2);
-
-                    modelSpace.AppendEntity(connectline);
-                    transaction.AddNewlyCreatedDBObject(connectline, true);
-				}
-                modelSpace.DowngradeOpen();
-                transaction.Commit();
+                    // ignored
+                }
             }
         }
+
+        /// <summary>
+        /// 根据两个 WCS 点和当前 UCS->WCS 矩阵，返回矩形四个角的 WCS 点集合（用于 SelectCrossingPolygon）
+        /// 顺序：左下、右下、右上、左上（闭合顺序）
+        /// </summary>
+        private Point3dCollection GetRectPointsInWcs(Point3d p1Wcs, Point3d p2Wcs, Matrix3d ucs2wcs)
+        {
+            // 把两个 WCS 点变回 UCS，便于按 UCS XY 平面构造矩形
+            Point3d p1Ucs = p1Wcs.TransformBy(ucs2wcs.Inverse());
+            Point3d p2Ucs = p2Wcs.TransformBy(ucs2wcs.Inverse());
+
+            double minX = Math.Min(p1Ucs.X, p2Ucs.X);
+            double maxX = Math.Max(p1Ucs.X, p2Ucs.X);
+            double minY = Math.Min(p1Ucs.Y, p2Ucs.Y);
+            double maxY = Math.Max(p1Ucs.Y, p2Ucs.Y);
+
+            // 在 UCS 平面上构造四角（Z=0）
+            Point3d leftDownUcs = new Point3d(minX, minY, 0);
+            Point3d rightDownUcs = new Point3d(maxX, minY, 0);
+            Point3d rightUpUcs = new Point3d(maxX, maxY, 0);
+            Point3d leftUpUcs = new Point3d(minX, maxY, 0);
+
+            // 转回 WCS（SelectCrossingPolygon 需要 WCS 点）
+            Point3dCollection result = new Point3dCollection
+            {
+                leftDownUcs,
+                rightDownUcs,
+                rightUpUcs,
+                leftUpUcs
+            };
+
+            return result;
+        }
+
 
         public List<Point> GetNtsPointsFromBlockreference(GeometryFactory geometryFactory, List<BlockReference> blockReferences)
         {
@@ -187,6 +230,52 @@ namespace TimeIsLife.CADCommand
             point3DCollection.Add(leftUpPoint);
 
             return point3DCollection;
+        }
+
+        private Line GetBlockreferenceConnectline1(BlockReference firstBlock, BlockReference secondBlock)
+        {
+            Database database = firstBlock.Database;
+            Line connectline = new Line();
+
+            // 事务用于访问数据库对象
+            using Transaction transaction = database.TransactionManager.StartTransaction();
+            // 获取第一个块的连接点
+            Point3dCollection firstBlockPoints = firstBlock.GetConnectionPoints();
+            // 获取第二个块的连接点
+            Point3dCollection secondBlockPoints = secondBlock.GetConnectionPoints();
+
+            // 如果两个块中至少有一个没有连接点，则不继续执行
+            if (firstBlockPoints.Count == 0 || secondBlockPoints.Count == 0)
+            {
+                return connectline;
+            }
+
+            // 计算最近的点对
+            double minDistance = double.MaxValue;
+            Point3d closestPointFromFirstBlock = Point3d.Origin;
+            Point3d closestPointFromSecondBlock = Point3d.Origin;
+
+            foreach (Point3d pointFromFirstBlock in firstBlockPoints)
+            {
+                foreach (Point3d pointFromSecondBlock in secondBlockPoints)
+                {
+                    double distance = pointFromFirstBlock.DistanceTo(pointFromSecondBlock);
+                    if (distance < minDistance)
+                    {
+                        minDistance = distance;
+                        closestPointFromFirstBlock = pointFromFirstBlock;
+                        closestPointFromSecondBlock = pointFromSecondBlock;
+                    }
+                }
+            }
+
+            // 创建一条连接这两个最近点的线
+            if (minDistance < double.MaxValue)
+            {
+                connectline = new Line(closestPointFromFirstBlock, closestPointFromSecondBlock);
+            }
+
+            return connectline;
         }
 
     }

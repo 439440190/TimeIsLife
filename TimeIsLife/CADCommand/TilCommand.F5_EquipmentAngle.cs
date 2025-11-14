@@ -70,7 +70,7 @@ namespace TimeIsLife.CADCommand
             PromptResult promptResult = editor.Drag(ucsSelectJig);
             if (promptResult.Status == PromptStatus.OK)
             {
-                endPoint3D = ucsSelectJig.endPoint3d.TransformBy(ucsToWcsMatrix3d.Inverse());
+                endPoint3D = ucsSelectJig.EndPointWcs.TransformBy(ucsToWcsMatrix3d.Inverse());
             }
             else
             {

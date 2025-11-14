@@ -72,7 +72,7 @@ namespace TimeIsLife.CADCommand
 			PromptResult promptResult = editor.Drag(ucsSelectJig);
 			if (promptResult.Status != PromptStatus.OK) return;
 
-			var endPoint3D = ucsSelectJig.endPoint3d.TransformBy(ucsToWcsMatrix3d.Inverse());
+			var endPoint3D = ucsSelectJig.EndPointWcs.TransformBy(ucsToWcsMatrix3d.Inverse());
 
 			Point3dCollection point3DCollection = GetPoint3DCollection(startPoint3D, endPoint3D, ucsToWcsMatrix3d);
 			TypedValueList typedValues = new TypedValueList

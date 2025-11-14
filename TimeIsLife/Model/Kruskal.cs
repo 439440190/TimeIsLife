@@ -12,147 +12,110 @@ namespace TimeIsLife.Model
 {
     public static class Kruskal
     {
+        private const double MaxDist = 15000;
+
         public static List<LineString> FindMinimumSpanningTree(List<Point> points, GeometryFactory geometry)
         {
-            int count = points.Count;
+            int n = points.Count;
             var result = new List<LineString>();
-            if (count > 100)
+            if (n < 2) return result;
+
+            double cell = MaxDist;
+            var grid = new Dictionary<(int, int), List<int>>();
+
+            // --- 构建空间网格 ---
+            for (int i = 0; i < n; i++)
             {
-                // 计算点之间的距离并保存为边
-                List<Tuple<int, int, double>> edges = new List<Tuple<int, int, double>>();
-                for (int i = 0; i < count; i++)
-                {
-                    for (int j = i + 1; j < count; j++)
-                    {
-                        double d = Distance(points[i], points[j]);
-                        if (d <= 15000)
-                        {
-                            edges.Add(Tuple.Create(i, j, d));
-                        }
-                    }
-                }
+                var p = points[i];
+                int cx = (int)(p.X / cell);
+                int cy = (int)(p.Y / cell);
+                var key = (cx, cy);
 
-                // 按距离排序边
-                edges.Sort((a, b) => a.Item3.CompareTo(b.Item3));
-
-                // 初始化并查集
-                int[] parent = new int[count];
-                for (int i = 0; i < count; i++)
-                {
-                    parent[i] = i;
-                }
-
-                // 查找并查集的根节点
-                int Find(int x)
-                {
-                    if (parent[x] != x)
-                    {
-                        parent[x] = Find(parent[x]);
-                    }
-                    return parent[x];
-                }
-
-                // 合并并查集
-                bool Union(int x, int y)
-                {
-                    int rootX = Find(x);
-                    int rootY = Find(y);
-                    if (rootX == rootY)
-                    {
-                        return false;
-                    }
-                    parent[rootX] = rootY;
-                    return true;
-                }
-
-                // 构建最小生成树
-
-                foreach (var edge in edges)
-                {
-                    int u = edge.Item1;
-                    int v = edge.Item2;
-                    if (Union(u, v))
-                    {
-                        result.Add(geometry.CreateLineString(new[] {
-                new Coordinate(points[u].X, points[u].Y),
-                new Coordinate(points[v].X, points[v].Y) }));
-                    }
-                }
+                if (!grid.ContainsKey(key))
+                    grid[key] = new List<int>();
+                grid[key].Add(i);
             }
-            else
+
+            // --- 构建候选边（只检查邻域九宫格） ---
+            var edges = new List<(int u, int v, double d)>();
+
+            foreach (var kv in grid)
             {
-                double[,] dist = new double[count, count];
+                var (cx, cy) = kv.Key;
 
-                // 初始化距离矩阵
-                for (int i = 0; i < count; i++)
+                for (int dx = -1; dx <= 1; dx++)
                 {
-                    for (int j = 0; j < count; j++)
+                    for (int dy = -1; dy <= 1; dy++)
                     {
-                        if (i == j)
-                        {
-                            dist[i, j] = 0;
-                        }
-                        else
-                        {
-                            double d = Distance(points[i], points[j]);
-                            dist[i, j] = d <= 15000 ? d : double.PositiveInfinity;
-                        }
-                    }
-                }
+                        var key2 = (cx + dx, cy + dy);
 
-                // Floyd-Warshall算法求解所有点对最短路径
-                for (int k = 0; k < count; k++)
-                {
-                    for (int i = 0; i < count; i++)
-                    {
-                        for (int j = 0; j < count; j++)
+                        if (!grid.ContainsKey(key2))
+                            continue;
+
+                        foreach (var i in kv.Value)
                         {
-                            if (dist[i, k] + dist[k, j] < dist[i, j])
+                            foreach (var j in grid[key2])
                             {
-                                dist[i, j] = dist[i, k] + dist[k, j];
+                                if (i >= j) continue;
+
+                                double d = Distance(points[i], points[j]);
+                                if (d <= MaxDist)
+                                    edges.Add((i, j, d));
                             }
                         }
                     }
                 }
+            }
 
-                // 构建最小生成树
-                var visited = new HashSet<int>() { 0 };
+            // 没有边直接返回
+            if (edges.Count == 0)
+                return result;
 
-                while (visited.Count < count)
+            // --- 按距离排序 ---
+            edges.Sort((a, b) => a.d.CompareTo(b.d));
+
+            // --- Kruskal 并查集 ---
+            int[] parent = new int[n];
+            for (int i = 0; i < n; i++) parent[i] = i;
+
+            int Find(int x)
+            {
+                while (x != parent[x])
+                    x = parent[x] = parent[parent[x]];
+                return x;
+            }
+
+            bool Union(int a, int b)
+            {
+                a = Find(a);
+                b = Find(b);
+                if (a == b) return false;
+                parent[a] = b;
+                return true;
+            }
+
+            // --- 生成 MST ---
+            foreach (var e in edges)
+            {
+                if (Union(e.u, e.v))
                 {
-                    double minDist = double.PositiveInfinity;
-                    int u = -1;
-                    int v = -1;
-
-                    // 在未访问的点中寻找距离最小的边
-                    foreach (var i in visited)
+                    result.Add(geometry.CreateLineString(new[]
                     {
-                        for (int j = 0; j < count; j++)
-                        {
-                            if (!visited.Contains(j) && dist[i, j] < minDist)
-                            {
-                                minDist = dist[i, j];
-                                u = i;
-                                v = j;
-                            }
-                        }
-                    }
-                    if (u != -1 && v != -1)
-                    {
-                        visited.Add(v);
-                        result.Add(geometry.CreateLineString(new[] {
-                        new Coordinate(points[u].X, points[u].Y),
-                        new Coordinate(points[v].X, points[v].Y) }));
-                    }
+                    new Coordinate(points[e.u].X, points[e.u].Y),
+                    new Coordinate(points[e.v].X, points[e.v].Y)
+                }));
                 }
             }
+
             return result;
         }
 
         private static double Distance(Point p1, Point p2)
         {
-            return Math.Sqrt(Math.Pow(p1.X - p2.X, 2) + Math.Pow(p1.Y - p2.Y, 2));
+            double dx = p1.X - p2.X;
+            double dy = p1.Y - p2.Y;
+            return Math.Sqrt(dx * dx + dy * dy);
         }
-
     }
+
 }
