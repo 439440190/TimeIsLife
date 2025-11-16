@@ -88,12 +88,12 @@
   <ItemGroup>
     <Compile Include="CADCommand\TilCommand.F10_TagToDbtext.cs" />
     <Compile Include="CADCommand\TilCommand.F12_ModifyTextStyle.cs" />
-    <Compile Include="CADCommand\TilCommand.F2_SetCurrentStatus.cs" />
-    <Compile Include="CADCommand\TilCommand.F5_EquipmentAngle.cs" />
-    <Compile Include="CADCommand\TilCommand.F8_EquipmentConnectLine.cs" />
-    <Compile Include="CADCommand\TilCommand.F9_FAS.cs" />
-    <Compile Include="CADCommand\TilCommand.F6_LoadYdbFile.cs" />
-    <Compile Include="CADCommand\TilCommand.F1_ConnectLine.cs" />
+    <Compile Include="CADCommand\TilCommand.F02_SetCurrentStatus.cs" />
+    <Compile Include="CADCommand\TilCommand.F05_EquipmentAngle.cs" />
+    <Compile Include="CADCommand\TilCommand.F08_EquipmentConnectLine.cs" />
+    <Compile Include="CADCommand\TilCommand.F09_FAS.cs" />
+    <Compile Include="CADCommand\TilCommand.F06_LoadYdbFile.cs" />
+    <Compile Include="CADCommand\TilCommand.F01_ConnectLine.cs" />
     <Compile Include="CADCommand\TilCommand.FF_FireAlarmCeiling.cs" />
     <Compile Include="CADCommand\TilCommand.FF_GenerateMonitorSystem.cs" />
     <Compile Include="CADCommand\TilCommand.FF_QuickUcs.cs" />
@@ -146,7 +146,7 @@
     <Compile Include="Jig\LightingLayoutJig.cs" />
     <Compile Include="Model\BlockScaleEnum.cs" />
     <Compile Include="CADCommand\ElectricalCommand.cs" />
-    <Compile Include="CADCommand\TilCommand.F7_LayoutEquipment.cs" />
+    <Compile Include="CADCommand\TilCommand.F07_LayoutEquipment.cs" />
     <Compile Include="CADCommand\TilCommand.cs" />
     <Compile Include="Jig\UcsSelectJig.cs" />
     <Compile Include="Model\PoleEnum.cs" />
@@ -288,7 +288,7 @@
     <None Include="Block\EL\电气火灾监控器.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Compile Include="CADCommand\TilCommand.F3_ConnectMultiLines.cs" />
+    <Compile Include="CADCommand\TilCommand.F03_ConnectMultiLines.cs" />
     <None Include="Block\FA\FA-10-防火阀%2870°C熔断关闭%29.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -394,7 +394,7 @@
     <None Include="Block\FA\FA-总线短路隔离器.dwg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <Compile Include="CADCommand\TilCommand.F4_AlignUcs.cs" />
+    <Compile Include="CADCommand\TilCommand.F04_AlignUcs.cs" />
     <Compile Include="CADCommand\TilCommand.F11_ExplodeMInsertBlock.cs" />
     <None Include="SchematicBlock\FA\Circle\FA-01-接线端子箱.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

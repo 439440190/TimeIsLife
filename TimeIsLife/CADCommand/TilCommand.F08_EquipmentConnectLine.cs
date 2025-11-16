@@ -235,7 +235,7 @@ namespace TimeIsLife.CADCommand
                                 Math.Abs(b.Position.X - endPoint.X) < tolerance &&
                                 Math.Abs(b.Position.Y - endPoint.Y) < tolerance);
 
-                            Line connectline = GetBlockreferenceConnectline(br1, br2);
+                            Line connectline = BuildConnectLine(br1, br2);
 
 
                             modelSpace.AppendEntity(connectline);
